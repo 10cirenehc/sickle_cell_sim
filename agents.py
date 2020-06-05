@@ -8,10 +8,13 @@ class Adult(RandomWalker):
     The init is the same as the RandomWalker.
     """
     genotype = None
+    age = None
 
-    def __init__(self, unique_id, pos, model, moore, genotype = None):
+    def __init__(self, unique_id, pos, model, moore, genotype = None, age = None):
         super().__init__(unique_id, pos, model, moore=moore)
         self.genotype = genotype
+        self.life_expectancy = 90
+        self.age = age
 
     def step(self):
         """
@@ -23,13 +26,6 @@ class Adult(RandomWalker):
         if self.model.grass:
             # Reduce energy
             self.energy -= 1
-
-            # If there is grass available, eat it
-            this_cell = self.model.grid.get_cell_list_contents([self.pos])
-            grass_patch = [obj for obj in this_cell if isinstance(obj, GrassPatch)][0]
-            if grass_patch.fully_grown:
-                self.energy += self.model.sheep_gain_from_food
-                grass_patch.fully_grown = False
 
             # Death
             if self.energy < 0:
@@ -52,21 +48,24 @@ class AdultSickle(Adult):
 
     genotype = None
 
-    def __init__(self, unique_id, pos, model, moore, genotype):
-        super().__init__(unique_id,pos, model, moore=moore, genotype=1.0)
+    def __init__(self, unique_id, pos, model, moore, genotype, age = None):
+        super().__init__(unique_id,pos, model, moore=moore, genotype=1.0, age = None)
         self.genotype = genotype
+        self.age = age
 
 class AdultCarrier(Adult):
 
-    def __init__(self, unique_id, pos, model, moore, genotype):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5)
+    def __init__(self, unique_id, pos, model, moore, genotype, age = None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5, age = None)
         self.genotype = genotype
+        self.age = age
 
 class AdultNormal(Adult):
 
-    def __init__(self, unique_id, pos, model, moore, genotype):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=0.0)
+    def __init__(self, unique_id, pos, model, moore, genotype, age = None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype = 0, age = None)
         self.genotype = genotype
+        self.age = age
 
 
 class Child(RandomWalker):
@@ -74,15 +73,17 @@ class Child(RandomWalker):
     A wolf that walks around, reproduces (asexually) and eats sheep.
     """
 
-    energy = None
+    genotype = None
+    age = None
 
-    def __init__(self, unique_id, pos, model, moore, energy=None):
+    def __init__(self, unique_id, pos, model, moore, genotype=None):
         super().__init__(unique_id, pos, model, moore=moore)
-        self.energy = energy
+        self.genotype = genotype
+        self.maturation = 5
+        self.age = 0
 
     def step(self):
         self.random_move()
-        self.energy -= 1
 
         # If there are sheep present, eat one
         x, y = self.pos
@@ -104,35 +105,42 @@ class Child(RandomWalker):
             if self.random.random() < self.model.wolf_reproduce:
                 # Create a new wolf cub
                 self.energy /= 2
-                cub = Wolf(
+                cub = Adult(
                     self.model.next_id(), self.pos, self.model, self.moore, self.energy
                 )
                 self.model.grid.place_agent(cub, cub.pos)
                 self.model.schedule.add(cub)
 
 
-class GrassPatch(Agent):
-    """
-    A patch of grass that grows at a fixed rate and it is eaten by sheep
-    """
+class ChildSickle(Child):
 
-    def __init__(self, unique_id, pos, model, fully_grown, countdown):
-        """
-        Creates a new patch of grass
-        Args:
-            grown: (boolean) Whether the patch of grass is fully grown or not
-            countdown: Time for the patch of grass to be fully grown again
-        """
-        super().__init__(unique_id, model)
-        self.fully_grown = fully_grown
-        self.countdown = countdown
-        self.pos = pos
+    genotype = None
+    age = None
 
-    def step(self):
-        if not self.fully_grown:
-            if self.countdown <= 0:
-                # Set as fully grown
-                self.fully_grown = True
-                self.countdown = self.model.grass_regrowth_time
-            else:
-                self.countdown -= 1
+    def __init__(self, unique_id, pos, model, moore, genotype=None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=1.0)
+        self.genotype = genotype
+        self.maturation = 5
+        self.age = 0
+
+
+class ChildCarrier(Child):
+    genotype = None
+    age = None
+
+    def __init__(self, unique_id, pos, model, moore, genotype=None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5)
+        self.genotype = genotype
+        self.maturation = 5
+        self.age = 0
+
+
+class ChildNormal(Child):
+    genotype = None
+    age = None
+
+    def __init__(self, unique_id, pos, model, moore, genotype=None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5)
+        self.genotype = genotype
+        self.maturation = 5
+        self.age = 0
