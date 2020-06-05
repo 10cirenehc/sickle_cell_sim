@@ -2,29 +2,29 @@ from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 
-from agents import Sheep, Wolf, GrassPatch
+from agents import Adult,Child
 from schedule import RandomActivationByBreed
 
 
-class WolfSheep(Model):
+class SickleSim(Model):
     """
     Wolf-Sheep Predation Model
     """
 
-    height = 20
-    width = 20
+    height = 100
+    width = 100
 
-    initial_sheep = 100
-    initial_wolves = 50
+    initial_sickle_adult = 100
+    initial_carrier_adult = 100
+    initial_normal_adult = 100
 
-    sheep_reproduce = 0.04
-    wolf_reproduce = 0.05
+    fertility_rate = 2
+    life_expectancy = 70
+    child_malaria_infection = 0.01
+    child_malaria_death = 0.1
+    adult_malaria_infection = 0.001
+    adult_malaria_death = 0.05
 
-    wolf_gain_from_food = 20
-
-    grass = False
-    grass_regrowth_time = 30
-    sheep_gain_from_food = 4
 
     verbose = False  # Print-monitoring
 
@@ -34,16 +34,18 @@ class WolfSheep(Model):
 
     def __init__(
         self,
-        height=20,
-        width=20,
-        initial_sheep=100,
-        initial_wolves=50,
-        sheep_reproduce=0.04,
-        wolf_reproduce=0.05,
-        wolf_gain_from_food=20,
-        grass=False,
-        grass_regrowth_time=30,
-        sheep_gain_from_food=4,
+        height=100,
+        width=100,
+        initial_sickle_adult=100,
+        initial_carrier_adult=100,
+        initial_normal_adult=100,
+        fertility_rate=2,
+        life_expectancy=70,
+        child_malaria_infection=0.01,
+        child_malaria_death=0.1,
+        adult_malaria_infection=0.001,
+        adult_malaria_death=0.05,
+        verbose = False
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -62,14 +64,16 @@ class WolfSheep(Model):
         # Set parameters
         self.height = height
         self.width = width
-        self.initial_sheep = initial_sheep
-        self.initial_wolves = initial_wolves
-        self.sheep_reproduce = sheep_reproduce
-        self.wolf_reproduce = wolf_reproduce
-        self.wolf_gain_from_food = wolf_gain_from_food
-        self.grass = grass
-        self.grass_regrowth_time = grass_regrowth_time
-        self.sheep_gain_from_food = sheep_gain_from_food
+        self.initial_sickle_adult = initial_sickle_adult
+        self.initial_carrier_adult = initial_carrier_adult
+        self.initial_normal_adult = initial_normal_adult,
+        self.fertility_rate = fertility_rate,
+        self.life_expectancy = life_expectancy,
+        self.child_malaria_infection = child_malaria_infection,
+        self.child_malaria_death = child_malaria_death,
+        self.adult_malaria_infection = adult_malaria_infection,
+        self.adult_malaria_death = adult_malaria_death,
+        self.verbose = verbose
 
         self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
@@ -80,23 +84,19 @@ class WolfSheep(Model):
             }
         )
 
-        # Create sheep:
-        for i in range(self.initial_sheep):
+        #Create normal adults
+        for i in range(self.initial_normal_adult):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
-            energy = self.random.randrange(2 * self.sheep_gain_from_food)
-            sheep = Sheep(self.next_id(), (x, y), self, True, energy)
-            self.grid.place_agent(sheep, (x, y))
-            self.schedule.add(sheep)
+            genotype = 0.0
+            adult = Adult(self.next_id(), (x, y), self, True, genotype)
+            self.grid.place_agent(adult, (x, y))
+            self.schedule.add(adult)
+        #Create hetero adults:
+        for i in range(self.initial_normal_adult):
 
-        # Create wolves
-        for i in range(self.initial_wolves):
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
-            energy = self.random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self.next_id(), (x, y), self, True, energy)
-            self.grid.place_agent(wolf, (x, y))
-            self.schedule.add(wolf)
+        #Create sickle cell adults:
+
 
         # Create grass patches
         if self.grass:

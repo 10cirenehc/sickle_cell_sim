@@ -2,23 +2,23 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from agents import Wolf, Sheep, GrassPatch
-from model import WolfSheep
+from agents import Adult, Child, GrassPatch
+from model import SickleSim
 
 
-def wolf_sheep_portrayal(agent):
+def sickle_cell_portrayal(agent):
     if agent is None:
         return
 
     portrayal = {}
 
-    if type(agent) is Sheep:
+    if type(agent) is Adult:
         portrayal["Shape"] = "wolf_sheep/resources/sheep.png"
         # https://icons8.com/web-app/433/sheep
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
 
-    elif type(agent) is Wolf:
+    elif type(agent) is Child:
         portrayal["Shape"] = "wolf_sheep/resources/wolf.png"
         # https://icons8.com/web-app/36821/German-Shepherd
         portrayal["scale"] = 0.9
@@ -40,7 +40,7 @@ def wolf_sheep_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(wolf_sheep_portrayal, 20, 20, 500, 500)
+canvas_element = CanvasGrid(sickle_cell_portrayal, 20, 20, 500, 500)
 chart_element = ChartModule(
     [{"Label": "Wolves", "Color": "#AA0000"}, {"Label": "Sheep", "Color": "#666666"}]
 )
@@ -77,6 +77,6 @@ model_params = {
 }
 
 server = ModularServer(
-    WolfSheep, [canvas_element, chart_element], "Wolf Sheep Predation", model_params
+    SickleSim, [canvas_element, chart_element], "Wolf Sheep Predation", model_params
 )
 server.port = 8521

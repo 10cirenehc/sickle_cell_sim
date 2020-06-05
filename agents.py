@@ -2,17 +2,16 @@ from mesa import Agent
 from random_walk import RandomWalker
 
 
-class Sheep(RandomWalker):
+class Adult(RandomWalker):
     """
     A sheep that walks around, reproduces (asexually) and gets eaten.
     The init is the same as the RandomWalker.
     """
+    genotype = None
 
-    energy = None
-
-    def __init__(self, unique_id, pos, model, moore, energy=None):
+    def __init__(self, unique_id, pos, model, moore, genotype = None):
         super().__init__(unique_id, pos, model, moore=moore)
-        self.energy = energy
+        self.genotype = genotype
 
     def step(self):
         """
@@ -49,7 +48,28 @@ class Sheep(RandomWalker):
             self.model.schedule.add(lamb)
 
 
-class Wolf(RandomWalker):
+class AdultSickle(Adult):
+
+    genotype = None
+
+    def __init__(self, unique_id, pos, model, moore, genotype):
+        super().__init__(unique_id,pos, model, moore=moore, genotype=1.0)
+        self.genotype = genotype
+
+class AdultCarrier(Adult):
+
+    def __init__(self, unique_id, pos, model, moore, genotype):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5)
+        self.genotype = genotype
+
+class AdultNormal(Adult):
+
+    def __init__(self, unique_id, pos, model, moore, genotype):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.0)
+        self.genotype = genotype
+
+
+class Child(RandomWalker):
     """
     A wolf that walks around, reproduces (asexually) and eats sheep.
     """
