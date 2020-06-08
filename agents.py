@@ -23,25 +23,14 @@ class Adult(RandomWalker):
         self.random_move()
         living = True
 
-        if self.model.grass:
-            # Reduce energy
-            self.energy -= 1
+        # Reduce energy
+        self.age += 1
 
-            # Death
-            if self.energy < 0:
+        # Death
+        if self.age > self.life_expectancy:
                 self.model.grid._remove_agent(self.pos, self)
                 self.model.schedule.remove(self)
                 living = False
-
-        if living and self.random.random() < self.model.sheep_reproduce:
-            # Create a new sheep:
-            if self.model.grass:
-                self.energy /= 2
-            lamb = Sheep(
-                self.model.next_id(), self.pos, self.model, self.moore, self.energy
-            )
-            self.model.grid.place_agent(lamb, self.pos)
-            self.model.schedule.add(lamb)
 
 
 class AdultSickle(Adult):
@@ -84,18 +73,13 @@ class Child(RandomWalker):
 
     def step(self):
         self.random_move()
+        self.age += 1
 
-        # If there are sheep present, eat one
-        x, y = self.pos
-        this_cell = self.model.grid.get_cell_list_contents([self.pos])
-        sheep = [obj for obj in this_cell if isinstance(obj, Sheep)]
-        if len(sheep) > 0:
-            sheep_to_eat = self.random.choice(sheep)
-            self.energy += self.model.wolf_gain_from_food
+        if self.age >= 5:
+            teen =
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
 
-            # Kill the sheep
-            self.model.grid._remove_agent(self.pos, sheep_to_eat)
-            self.model.schedule.remove(sheep_to_eat)
 
         # Death or reproduction
         if self.energy < 0:
@@ -124,6 +108,20 @@ class ChildSickle(Child):
         self.age = 0
 
 
+    def step(self):
+        self.random_move()
+        self.age += 1
+
+        if self.age >=5:
+            teen = AdultSickle(
+                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
+            )
+            self.model.grip.place_agent(teen, teen.pos)
+            self.model.schedule.ad(teen)
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
+
+
 class ChildCarrier(Child):
     genotype = None
     age = None
@@ -135,12 +133,40 @@ class ChildCarrier(Child):
         self.age = 0
 
 
+    def step(self):
+        self.random_move()
+        self.age += 1
+
+        if self.age >=5:
+            teen = AdultCarrier(
+                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
+            )
+            self.model.grip.place_agent(teen, teen.pos)
+            self.model.schedule.ad(teen)
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
+
+
 class ChildNormal(Child):
     genotype = None
     age = None
 
     def __init__(self, unique_id, pos, model, moore, genotype=None):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5)
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.0)
         self.genotype = genotype
         self.maturation = 5
         self.age = 0
+
+
+    def step(self):
+        self.random_move()
+        self.age += 1
+
+        if self.age >=5:
+            teen = AdultNormal(
+                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
+            )
+            self.model.grip.place_agent(teen, teen.pos)
+            self.model.schedule.ad(teen)
+            self.model.grid._remove_agent(self.pos, self)
+            self.model.schedule.remove(self)
