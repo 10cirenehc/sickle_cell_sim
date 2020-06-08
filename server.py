@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from agents import Adult, Child, GrassPatch
+from agents import AdultSickle, AdultNormal, AdultCarrier, ChildSickle, ChildCarrier, ChildNormal
 from model import SickleSim
 
 
@@ -12,13 +12,13 @@ def sickle_cell_portrayal(agent):
 
     portrayal = {}
 
-    if type(agent) is Adult:
+    if type(agent) is AdultNormal:
         portrayal["Shape"] = "wolf_sheep/resources/sheep.png"
         # https://icons8.com/web-app/433/sheep
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
 
-    elif type(agent) is Child:
+    elif type(agent) is AdultCarrier:
         portrayal["Shape"] = "wolf_sheep/resources/wolf.png"
         # https://icons8.com/web-app/36821/German-Shepherd
         portrayal["scale"] = 0.9
@@ -26,7 +26,7 @@ def sickle_cell_portrayal(agent):
         portrayal["text"] = round(agent.energy, 1)
         portrayal["text_color"] = "White"
 
-    elif type(agent) is GrassPatch:
+    elif type(agent) is AdultSickle:
         if agent.fully_grown:
             portrayal["Color"] = ["#00FF00", "#00CC00", "#009900"]
         else:
