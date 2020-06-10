@@ -205,8 +205,6 @@ class SickleSim(Model):
             self.grid.remove_agent(delete)
             self.schedule.remove(delete)
 
-
-
         # collect data
         self.data_collector.collect(self)
         if self.verbose:

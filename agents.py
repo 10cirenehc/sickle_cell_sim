@@ -42,7 +42,8 @@ class AdultSickle(Adult):
         self.age = age
 
     def step(self):
-        super().step(self)
+        super().step()
+
 
 class AdultCarrier(Adult):
 
@@ -52,7 +53,8 @@ class AdultCarrier(Adult):
         self.age = age
 
     def step(self):
-        super().step(self)
+        super().step()
+
 
 class AdultNormal(Adult):
 
@@ -62,7 +64,8 @@ class AdultNormal(Adult):
         self.age = age
 
     def step(self):
-        super().step(self)
+        super().step()
+
 
 class Child(RandomWalker):
     """
@@ -90,7 +93,6 @@ class ChildSickle(Child):
         self.maturation = 5
         self.age = 0
 
-
     def step(self):
         self.random_move()
         self.age += 1
@@ -115,7 +117,6 @@ class ChildCarrier(Child):
         self.maturation = 5
         self.age = 0
 
-
     def step(self):
         self.random_move()
         self.age += 1
@@ -139,7 +140,6 @@ class ChildNormal(Child):
         self.genotype = genotype
         self.maturation = 5
         self.age = 0
-
 
     def step(self):
         self.random_move()

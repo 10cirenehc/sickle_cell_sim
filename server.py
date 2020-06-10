@@ -13,29 +13,37 @@ def sickle_cell_portrayal(agent):
     portrayal = {}
 
     if type(agent) is AdultNormal:
-        portrayal["Shape"] = "wolf_sheep/resources/sheep.png"
-        # https://icons8.com/web-app/433/sheep
-        portrayal["scale"] = 0.9
-        portrayal["Layer"] = 1
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.3
+        portrayal["Color"] = "#00FF53"
 
     elif type(agent) is AdultCarrier:
-        portrayal["Shape"] = "wolf_sheep/resources/wolf.png"
-        # https://icons8.com/web-app/36821/German-Shepherd
-        portrayal["scale"] = 0.9
-        portrayal["Layer"] = 2
-        portrayal["text"] = round(agent.energy, 1)
-        portrayal["text_color"] = "White"
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.3
+        portrayal["Color"] = "#F5e70F"
 
     elif type(agent) is AdultSickle:
-        if agent.fully_grown:
-            portrayal["Color"] = ["#00FF00", "#00CC00", "#009900"]
-        else:
-            portrayal["Color"] = ["#84e184", "#adebad", "#d6f5d6"]
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.3
+        portrayal["Color"] = "#F50F23"
+
+    elif type(agent) is ChildNormal:
         portrayal["Shape"] = "rect"
-        portrayal["Filled"] = "true"
-        portrayal["Layer"] = 0
-        portrayal["w"] = 1
-        portrayal["h"] = 1
+        portrayal["w"] = 0.3
+        portrayal["h"] = 0.3
+        portrayal["Color"] = "#F50F23"
+
+    elif type(agent) is ChildCarrier:
+        portrayal["Shape"] = "rect"
+        portrayal["w"] = 0.3
+        portrayal["h"] = 0.3
+        portrayal["Color"] = "#F50F23"
+
+    elif type(agent) is ChildSickle:
+        portrayal["Shape"] = "rect"
+        portrayal["w"] = 0.3
+        portrayal["h"] = 0.3
+        portrayal["Color"] = "#F50F23"
 
     return portrayal
 
@@ -77,6 +85,6 @@ model_params = {
 }
 
 server = ModularServer(
-    SickleSim, [canvas_element, chart_element], "Wolf Sheep Predation", model_params
+    SickleSim, [canvas_element, chart_element], "Sickle Cell Selection", model_params
 )
 server.port = 8521
