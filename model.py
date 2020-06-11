@@ -35,14 +35,12 @@ class SickleSim(Model):
         initial_normal_adult=100,
         initial_sickle_adult=100,
         initial_carrier_adult=100,
-        fertility_rate=2,
-        life_expectancy=70,
+        life_expectancy=80,
         carrying_capacity = 3000,
-        child_malaria_infection=0.01,
-        child_malaria_death=0.1,
-        adult_malaria_infection=0.001,
-        adult_malaria_death=0.05,
-        verbose=False
+        verbose=False,
+        malaria_prevalence=0.5,
+        sickle_cell_deadliness=0.5,
+        heterozygous_advantage=0.5,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -64,14 +62,12 @@ class SickleSim(Model):
         self.initial_sickle_adult = initial_sickle_adult
         self.initial_carrier_adult = initial_carrier_adult
         self.initial_normal_adult = initial_normal_adult
-        self.fertility_rate = fertility_rate
         self.life_expectancy = life_expectancy
-        self.child_malaria_infection = child_malaria_infection
-        self.child_malaria_death = child_malaria_death
-        self.adult_malaria_infection = adult_malaria_infection
-        self.adult_malaria_death = adult_malaria_death
         self.verbose = verbose
         self.carrying_capacity = carrying_capacity
+        self.malaria_prevalence = 2*malaria_prevalence
+        self.sickle_cell_deadliness = 2*sickle_cell_deadliness
+        self.heterozygous_advantage = 2-2*heterozygous_advantage
 
         self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
@@ -86,12 +82,24 @@ class SickleSim(Model):
             }
         )
 
+        self.adult_population = initial_normal_adult+initial_carrier_adult+initial_sickle_adult
+        ages = []
+        for i in range(self.adult_population):
+            age = 0
+            while age < 5 or age > 75:
+                age = self.random.gauss(self, 0, 30)
+            ages.append(age)
+
+        self.initial_normal_child = round(0.1*initial_normal_adult)
+        self.initial_carrier_child = round(0.1*initial_carrier_adult)
+        self.initial_sickle_child = round(0.1*initial_carrier_adult)
+
         # Create normal adults
         for i in range(self.initial_normal_adult):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             genotype = 0.0
-            adult = AdultSickle(self.next_id(), (x, y), self, True, genotype)
+            adult = AdultNormal(self.next_id(), (x, y), self, True, genotype, ages.pop())
             self.grid.place_agent(adult, (x, y))
             self.schedule.add(adult)
         # Create carrier adults:
@@ -99,18 +107,45 @@ class SickleSim(Model):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             genotype = 0.5
-            adult = AdultSickle(self.next_id(), (x, y), self, True, genotype)
+            adult = AdultCarrier(self.next_id(), (x, y), self, True, genotype, ages.pop())
             self.grid.place_agent(adult, (x, y))
             self.schedule.add(adult)
 
-        # Create sickle cell adults:
-        for i in range(self.initial_carrier_adult):
+        # Create carrier adults:
+        for i in range(self.initial_sickle_adult):
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            genotype = 1.0
+            adult = AdultSickle(self.next_id(), (x, y), self, True, genotype, ages.pop())
+            self.grid.place_agent(adult, (x, y))
+            self.schedule.add(adult)
+
+        # Create normal adults:
+        for i in range(self.initial_normal_child):
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            genotype = 0.0
+            child = ChildNormal(self.next_id(), (x, y), self, True, genotype, self.random.randint(0, 4))
+            self.grid.place_agent(child, (x, y))
+            self.schedule.add(child)
+
+        # Create carrier children:
+        for i in range(self.initial_carrier_child):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             genotype = 0.5
-            adult = AdultSickle(self.next_id(), (x, y), self, True, genotype)
-            self.grid.place_agent(adult, (x, y))
-            self.schedule.add(adult)
+            child = ChildCarrier(self.next_id(), (x, y), self, True, genotype, self.random.randint(0, 4))
+            self.grid.place_agent(child, (x, y))
+            self.schedule.add(child)
+
+        # Create sickle children:
+        for i in range(self.initial_sickle_child):
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            genotype = 1.0
+            child = ChildSickle(self.next_id(), (x, y), self, True, genotype, self.random.randint(0, 4))
+            self.grid.place_agent(child, (x, y))
+            self.schedule.add(child)
 
     def step(self):
         self.schedule.step()
@@ -143,13 +178,14 @@ class SickleSim(Model):
             y2 -= y2_del
 
         dx1 = (((y1 ** 2)+(1/2)*y1*y2+(1/4)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population
-               - (0.015 * x1))
+               - (0.015 * self.malaria_prevalence * x1))
         dx2 = (((1/2)*y1*y2+(1/2)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population
-               - (0.0013+0.02)*x2)
-        dx3 = ((1/4)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population-(0.0013+0.5)*x3
-        dy1 = -(0.008+0.0006)*y1
-        dy2 = -(0.008+0.00005+0.02)*y2
-        dy3 = -(0.008+0.00005+0.5)*y3
+               - ((0.0013*self.malaria_prevalence*self.heterozygous_advantage)+0.02*self.sickle_cell_deadliness)*x2)
+        dx3 = ((1/4)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population-(0.0013*self.malaria_prevalence
+            * self.heterozygous_advantage+0.5*self.sickle_cell_deadliness)*x3
+        dy1 = -(0.008+0.0006*self.malaria_prevalence)*y1
+        dy2 = -(0.008+0.00005*self.malaria_prevalence*self.heterozygous_advantage+0.02*self.sickle_cell_deadliness)*y2
+        dy3 = -(0.008+0.00005*self.malaria_prevalence*self.heterozygous_advantage+0.5*self.sickle_cell_deadliness)*y3
 
         if dx1 < 0:
             delete = self.random.choices(self, self.schedule.agents_by_breed[ChildNormal], k=abs(round(dx1)))

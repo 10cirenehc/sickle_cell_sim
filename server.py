@@ -48,40 +48,33 @@ def sickle_cell_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(sickle_cell_portrayal, 20, 20, 500, 500)
+canvas_element = CanvasGrid(sickle_cell_portrayal, 100, 100, 700, 700)
 chart_element = ChartModule(
-    [{"Label": "Wolves", "Color": "#AA0000"}, {"Label": "Sheep", "Color": "#666666"}]
+    [{"Label": "Normal Adults", "Color": "#16981C"}, {"Label": "Carrier Adults", "Color": "#FFFD0F"},
+     {"Label": "Sickle Cell Adults", "Color": "FF130F"}, {"Label": "Normal Children", "Color": "0FFFDE"},
+     {"Label": "Carrier Children", "Color": "FFD80F"}, {"Label": "Sickle Cell Children", "Color": "FF0FB0"}]
 )
 
 model_params = {
-    "grass": UserSettableParameter("checkbox", "Grass Enabled", True),
-    "grass_regrowth_time": UserSettableParameter(
-        "slider", "Grass Regrowth Time", 20, 1, 50
+    "initial_normal_adult": UserSettableParameter(
+        "slider", "Normal Adults", value=500, min_value=100, max_value=800, step=5
     ),
-    "initial_sheep": UserSettableParameter(
-        "slider", "Initial Sheep Population", 100, 10, 300
+    "initial_carrier_adult": UserSettableParameter(
+        "slider", "Carrier Adults", value=500, min_value=100, max_value=800, step=5
     ),
-    "sheep_reproduce": UserSettableParameter(
-        "slider", "Sheep Reproduction Rate", 0.04, 0.01, 1.0, 0.01
+    "initial_sickle_adult": UserSettableParameter(
+        "slider", "Afflicted Adults", value=500, min_value=100, max_value=800, step=5
     ),
-    "initial_wolves": UserSettableParameter(
-        "slider", "Initial Wolf Population", 50, 10, 300
+    "malaria_prevalence": UserSettableParameter(
+        "slider", "Prevalence of Malaria", value=0.5, min_value=0, max_value=1, step=0.01
     ),
-    "wolf_reproduce": UserSettableParameter(
-        "slider",
-        "Wolf Reproduction Rate",
-        0.05,
-        0.01,
-        1.0,
-        0.01,
-        description="The rate at which wolf agents reproduce.",
+    "sickle_cell_deadliness": UserSettableParameter(
+        "slider", "Sickle Cell Deadliness", value=0.5, min_value=0, max_value=1, step=0.01
     ),
-    "wolf_gain_from_food": UserSettableParameter(
-        "slider", "Wolf Gain From Food Rate", 20, 1, 50
-    ),
-    "sheep_gain_from_food": UserSettableParameter(
-        "slider", "Sheep Gain From Food", 4, 1, 10
-    ),
+    "heterozygous_advantage": UserSettableParameter(
+        "slider", "Heterozygous Advantage", value=0.5, min_value=0, max_value=1, step=0.01
+    )
+
 }
 
 server = ModularServer(

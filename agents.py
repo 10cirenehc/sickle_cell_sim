@@ -75,11 +75,11 @@ class Child(RandomWalker):
     genotype = None
     age = None
 
-    def __init__(self, unique_id, pos, model, moore, genotype=None):
+    def __init__(self, unique_id, pos, model, moore, genotype=None, age=None):
         super().__init__(unique_id, pos, model, moore=moore)
         self.genotype = genotype
         self.maturation = 5
-        self.age = 0
+        self.age = age
 
 
 class ChildSickle(Child):
@@ -87,11 +87,11 @@ class ChildSickle(Child):
     genotype = None
     age = None
 
-    def __init__(self, unique_id, pos, model, moore, genotype=None):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=1.0)
+    def __init__(self, unique_id, pos, model, moore, genotype=None, age=None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=1.0, age=None)
         self.genotype = genotype
         self.maturation = 5
-        self.age = 0
+        self.age = age
 
     def step(self):
         self.random_move()
@@ -111,11 +111,11 @@ class ChildCarrier(Child):
     genotype = None
     age = None
 
-    def __init__(self, unique_id, pos, model, moore, genotype=None):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5)
+    def __init__(self, unique_id, pos, model, moore, genotype=None, age=None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5, age=None)
         self.genotype = genotype
         self.maturation = 5
-        self.age = 0
+        self.age = age
 
     def step(self):
         self.random_move()
@@ -135,11 +135,11 @@ class ChildNormal(Child):
     genotype = None
     age = None
 
-    def __init__(self, unique_id, pos, model, moore, genotype=None):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=0.0)
+    def __init__(self, unique_id, pos, model, moore, genotype=None, age=None):
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.0, age=None)
         self.genotype = genotype
         self.maturation = 5
-        self.age = 0
+        self.age = age
 
     def step(self):
         self.random_move()
