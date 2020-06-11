@@ -14,45 +14,57 @@ def sickle_cell_portrayal(agent):
 
     if type(agent) is AdultNormal:
         portrayal["Shape"] = "circle"
-        portrayal["r"] = 0.3
-        portrayal["Color"] = "#00FF53"
+        portrayal["r"] = 1
+        portrayal["Color"] = "#16981C"
+        portrayal["Layer"] = 1
+        portrayal["Filled"] = "true"
 
     elif type(agent) is AdultCarrier:
         portrayal["Shape"] = "circle"
-        portrayal["r"] = 0.3
-        portrayal["Color"] = "#F5e70F"
+        portrayal["r"] = 1
+        portrayal["Color"] = "#FFFD0F"
+        portrayal["Layer"] = 2
+        portrayal["Filled"] = "true"
 
     elif type(agent) is AdultSickle:
         portrayal["Shape"] = "circle"
-        portrayal["r"] = 0.3
-        portrayal["Color"] = "#F50F23"
+        portrayal["r"] = 1
+        portrayal["Color"] = "#FF130F"
+        portrayal["Layer"] = 2
+        portrayal["Filled"] = "true"
 
     elif type(agent) is ChildNormal:
         portrayal["Shape"] = "rect"
-        portrayal["w"] = 0.3
-        portrayal["h"] = 0.3
-        portrayal["Color"] = "#F50F23"
+        portrayal["w"] = 1
+        portrayal["h"] = 1
+        portrayal["Color"] = "#0FFFDE"
+        portrayal["Layer"] = 1
+        portrayal["Filled"] = "true"
 
     elif type(agent) is ChildCarrier:
         portrayal["Shape"] = "rect"
-        portrayal["w"] = 0.3
-        portrayal["h"] = 0.3
-        portrayal["Color"] = "#F50F23"
+        portrayal["w"] = 1
+        portrayal["h"] = 1
+        portrayal["Color"] = "#FFD80F"
+        portrayal["Layer"] = 2
+        portrayal["Filled"] = "true"
 
     elif type(agent) is ChildSickle:
         portrayal["Shape"] = "rect"
-        portrayal["w"] = 0.3
-        portrayal["h"] = 0.3
-        portrayal["Color"] = "#F50F23"
+        portrayal["w"] = 1
+        portrayal["h"] = 1
+        portrayal["Color"] = "#FF840F"
+        portrayal["Layer"] = 2
+        portrayal["Filled"] = "true"
 
     return portrayal
 
 
-canvas_element = CanvasGrid(sickle_cell_portrayal, 100, 100, 700, 700)
+grid = CanvasGrid(sickle_cell_portrayal, 100, 100, 700, 700)
 chart_element = ChartModule(
     [{"Label": "Normal Adults", "Color": "#16981C"}, {"Label": "Carrier Adults", "Color": "#FFFD0F"},
-     {"Label": "Sickle Cell Adults", "Color": "FF130F"}, {"Label": "Normal Children", "Color": "0FFFDE"},
-     {"Label": "Carrier Children", "Color": "FFD80F"}, {"Label": "Sickle Cell Children", "Color": "FF0FB0"}]
+     {"Label": "Sickle Cell Adults", "Color": "#FF130F"}, {"Label": "Normal Children", "Color": "#0FFFDE"},
+     {"Label": "Carrier Children", "Color": "#FFD80F"}, {"Label": "Sickle Cell Children", "Color": "#FF840F"}]
 )
 
 model_params = {
@@ -78,6 +90,6 @@ model_params = {
 }
 
 server = ModularServer(
-    SickleSim, [canvas_element, chart_element], "Sickle Cell Selection", model_params
+    SickleSim, [grid, chart_element], "Sickle Cell Selection", model_params
 )
 server.port = 8521

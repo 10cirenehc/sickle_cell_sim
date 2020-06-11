@@ -101,8 +101,8 @@ class ChildSickle(Child):
             teen = AdultSickle(
                 self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
             )
-            self.model.grip.place_agent(teen, teen.pos)
-            self.model.schedule.ad(teen)
+            self.model.grid.place_agent(teen, teen.pos)
+            self.model.schedule.add(teen)
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
 
@@ -125,8 +125,8 @@ class ChildCarrier(Child):
             teen = AdultCarrier(
                 self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
             )
-            self.model.grip.place_agent(teen, teen.pos)
-            self.model.schedule.ad(teen)
+            self.model.grid.place_agent(teen, teen.pos)
+            self.model.schedule.add(teen)
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
 
@@ -149,7 +149,7 @@ class ChildNormal(Child):
             teen = AdultNormal(
                 self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
             )
-            self.model.grip.place_agent(teen, teen.pos)
-            self.model.schedule.ad(teen)
+            self.model.grid.place_agent(teen, teen.pos)
+            self.model.schedule.add(teen)
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)

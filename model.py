@@ -43,17 +43,14 @@ class SickleSim(Model):
         heterozygous_advantage=0.5,
     ):
         """
-        Create a new Wolf-Sheep model with the given parameters.
+        Create a new Sickle Cell model with the given parameters.
         Args:
-            initial_sheep: Number of sheep to start with
-            initial_wolves: Number of wolves to start with
-            sheep_reproduce: Probability of each sheep reproducing each step
-            wolf_reproduce: Probability of each wolf reproducing each step
-            wolf_gain_from_food: Energy a wolf gains from eating a sheep
-            grass: Whether to have the sheep eat grass for energy
-            grass_regrowth_time: How long it takes for a grass patch to regrow
-                                 once it is eaten
-            sheep_gain_from_food: Energy sheep gain from grass, if enabled.
+            initial_normal_adult: Number of normal adults to start with
+            initial_carrier_adult: Number of carrier adults to start with
+            initial_sickle_adult: Number of afflicted adults to start with
+            malaria_prevalence: Coefficient of malaria prevalence
+            sickle_cell_deadliness: Deadliness of sickle cell
+            heterozygous_advantage: The amount of selective advantage heterozygotes have
         """
         super().__init__()
         # Set parameters
@@ -71,7 +68,7 @@ class SickleSim(Model):
 
         self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
-        self.data_collector = DataCollector(
+        self.datacollector = DataCollector(
             {
                 "Sickle Cell Adults": lambda m: m.schedule.get_breed_count(AdultSickle),
                 "Carrier Adults": lambda m: m.schedule.get_breed_count(AdultCarrier),
@@ -87,7 +84,7 @@ class SickleSim(Model):
         for i in range(self.adult_population):
             age = 0
             while age < 5 or age > 75:
-                age = self.random.gauss(self, 0, 30)
+                age = self.random.gauss(0, 30)
             ages.append(age)
 
         self.initial_normal_child = round(0.1*initial_normal_adult)
@@ -188,7 +185,7 @@ class SickleSim(Model):
         dy3 = -(0.008+0.00005*self.malaria_prevalence*self.heterozygous_advantage+0.5*self.sickle_cell_deadliness)*y3
 
         if dx1 < 0:
-            delete = self.random.choices(self, self.schedule.agents_by_breed[ChildNormal], k=abs(round(dx1)))
+            delete = self.random.choices(self.schedule.agents_by_breed[ChildNormal], k=abs(round(dx1)))
             for a in delete:
                 self.grid.remove_agent(agent=a)
                 self.schedule.remove(agent=a)
@@ -201,7 +198,7 @@ class SickleSim(Model):
                 self.schedule.add(child)
 
         if dx2 < 0:
-            delete = self.random.choices(self, self.schedule.agents_by_breed[ChildCarrier], k=abs(round(dx2)))
+            delete = self.random.choices(self.schedule.agents_by_breed[ChildCarrier], k=abs(round(dx2)))
             for a in delete:
                 self.grid.remove_agent(agent=a)
                 self.schedule.remove(agent=a)
@@ -214,7 +211,7 @@ class SickleSim(Model):
                 self.schedule.add(child)
 
         if dx3 < 0:
-            delete = self.random.choices(self, self.schedule.agents_by_breed[ChildSickle], k=abs(round(dx3)))
+            delete = self.random.choices(self.schedule.agents_by_breed[ChildSickle], k=abs(round(dx3)))
             for a in delete:
                 self.grid.remove_agent(agent=a)
                 self.schedule.remove(agent=a)
@@ -242,7 +239,7 @@ class SickleSim(Model):
             self.schedule.remove(delete)
 
         # collect data
-        self.data_collector.collect(self)
+        self.datacollector.collect(self)
         if self.verbose:
             print(
                 [
