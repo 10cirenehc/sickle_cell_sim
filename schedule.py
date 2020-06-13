@@ -68,3 +68,5 @@ class RandomActivationByBreed(RandomActivation):
         Returns the current number of agents of certain breed in the queue.
         """
         return len(self.agents_by_breed[breed_class].values())
+
+

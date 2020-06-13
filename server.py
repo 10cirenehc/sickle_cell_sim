@@ -22,7 +22,7 @@ def sickle_cell_portrayal(agent):
     elif type(agent) is AdultCarrier:
         portrayal["Shape"] = "circle"
         portrayal["r"] = 1
-        portrayal["Color"] = "#FFFD0F"
+        portrayal["Color"] = "#CCCF02"
         portrayal["Layer"] = 2
         portrayal["Filled"] = "true"
 
@@ -53,18 +53,18 @@ def sickle_cell_portrayal(agent):
         portrayal["Shape"] = "rect"
         portrayal["w"] = 1
         portrayal["h"] = 1
-        portrayal["Color"] = "#FF840F"
+        portrayal["Color"] = "#C402CF"
         portrayal["Layer"] = 2
         portrayal["Filled"] = "true"
 
     return portrayal
 
 
-grid = CanvasGrid(sickle_cell_portrayal, 100, 100, 700, 700)
+grid = CanvasGrid(sickle_cell_portrayal, 70, 70, 700, 700)
 chart_element = ChartModule(
-    [{"Label": "Normal Adults", "Color": "#16981C"}, {"Label": "Carrier Adults", "Color": "#FFFD0F"},
+    [{"Label": "Normal Adults", "Color": "#16981C"}, {"Label": "Carrier Adults", "Color": "#CCCF02"},
      {"Label": "Sickle Cell Adults", "Color": "#FF130F"}, {"Label": "Normal Children", "Color": "#0FFFDE"},
-     {"Label": "Carrier Children", "Color": "#FFD80F"}, {"Label": "Sickle Cell Children", "Color": "#FF840F"}]
+     {"Label": "Carrier Children", "Color": "#FFD80F"}, {"Label": "Sickle Cell Children", "Color": "#C402CF"}]
 )
 
 model_params = {

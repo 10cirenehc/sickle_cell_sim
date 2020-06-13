@@ -8,8 +8,8 @@ from schedule import RandomActivationByBreed
 
 class SickleSim(Model):
 
-    height = 100
-    width = 100
+    height = 70
+    width = 70
 
     initial_sickle_adult = 100
     initial_carrier_adult = 100
@@ -30,8 +30,8 @@ class SickleSim(Model):
 
     def __init__(
         self,
-        height=100,
-        width=100,
+        height=70,
+        width=70,
         initial_normal_adult=100,
         initial_sickle_adult=100,
         initial_carrier_adult=100,
@@ -162,14 +162,8 @@ class SickleSim(Model):
             difference = self.schedule.get_agent_count()-3000
             y1_del = round((y1/(y1+y2))*difference)
             y2_del = round((y2/(y1+y2))*difference)
-            for i in range(y1_del):
-                candidate = self.random.choice(self, self.schedule.agents_by_breed[AdultNormal])
-                self.grid.remove_agent(candidate)
-                self.schedule.remove(candidate)
-            for i in range(y2_del):
-                candidate = self.random.choice(self,self.schedule.agents_by_breed[AdultCarrier])
-                self.grid.remove_agent(candidate)
-                self.schedule.remove(candidate)
+            self.delete_from_breed(AdultNormal, y1_del)
+            self.delete_from_breed(AdultCarrier, y2_del)
             population = 3000
             y1 -= y1_del
             y2 -= y2_del
@@ -185,10 +179,7 @@ class SickleSim(Model):
         dy3 = -(0.008+0.00005*self.malaria_prevalence*self.heterozygous_advantage+0.5*self.sickle_cell_deadliness)*y3
 
         if dx1 < 0:
-            delete = self.random.choices(self.schedule.agents_by_breed[ChildNormal], k=abs(round(dx1)))
-            for a in delete:
-                self.grid.remove_agent(agent=a)
-                self.schedule.remove(agent=a)
+            self.delete_from_breed(ChildNormal, abs(round(dx1)))
         else:
             for i in range(round(dx1)):
                 x = self.random.randrange(self.width)
@@ -198,10 +189,7 @@ class SickleSim(Model):
                 self.schedule.add(child)
 
         if dx2 < 0:
-            delete = self.random.choices(self.schedule.agents_by_breed[ChildCarrier], k=abs(round(dx2)))
-            for a in delete:
-                self.grid.remove_agent(agent=a)
-                self.schedule.remove(agent=a)
+            self.delete_from_breed(ChildSickle, abs(round(dx2)))
         else:
             for i in range(round(dx2)):
                 x = self.random.randrange(self.width)
@@ -211,10 +199,7 @@ class SickleSim(Model):
                 self.schedule.add(child)
 
         if dx3 < 0:
-            delete = self.random.choices(self.schedule.agents_by_breed[ChildSickle], k=abs(round(dx3)))
-            for a in delete:
-                self.grid.remove_agent(agent=a)
-                self.schedule.remove(agent=a)
+            self.delete_from_breed(ChildSickle, abs(round(dx1)))
         else:
             for i in range(round(dx3)):
                 x = self.random.randrange(self.width)
@@ -223,20 +208,9 @@ class SickleSim(Model):
                 self.grid.place_agent(child, (x, y))
                 self.schedule.add(child)
 
-        for i in range(abs(round(dy1))):
-            delete = self.random.choice(self, self.schedule.agents_by_breed[AdultNormal])
-            self.grid.remove_agent(delete)
-            self.schedule.remove(delete)
-
-        for i in range(abs(round(dy2))):
-            delete = self.random.choice(self, self.schedule.agents_by_breed[AdultCarrier])
-            self.grid.remove_agent(delete)
-            self.schedule.remove(delete)
-
-        for i in range(abs(round(dy3))):
-            delete = self.random.choice(self, self.schedule.agents_by_breed[AdultSickle])
-            self.grid.remove_agent(delete)
-            self.schedule.remove(delete)
+        self.delete_from_breed(AdultNormal, abs(round(dy1)))
+        self.delete_from_breed(AdultCarrier, abs(round(dy2)))
+        self.delete_from_breed(AdultSickle, abs(round(dy3)))
 
         # collect data
         self.datacollector.collect(self)
@@ -253,3 +227,13 @@ class SickleSim(Model):
 
         for i in range(step_count):
             self.step()
+
+    def delete_from_breed(self, breed, count):
+        agent_keys = []
+        for i in range(count):
+            agent_key = self.random.choice(list(self.schedule.agents_by_breed[breed].keys()))
+            if agent_key not in agent_keys:
+                agent = self.schedule.agents_by_breed[breed][agent_key]
+                self.grid.remove_agent(agent)
+                self.schedule.remove(agent)
+                agent_keys.append(agent_key)
