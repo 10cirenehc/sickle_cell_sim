@@ -16,7 +16,7 @@ class SickleSim(Model):
     initial_normal_adult = 100
 
     fertility_rate = 2
-    life_expectancy = 70
+    life_expectancy = 65
     child_malaria_infection = 0.01
     child_malaria_death = 0.1
     adult_malaria_infection = 0.001
@@ -35,7 +35,7 @@ class SickleSim(Model):
         initial_normal_adult=100,
         initial_sickle_adult=100,
         initial_carrier_adult=100,
-        life_expectancy=80,
+        life_expectancy=65,
         carrying_capacity = 3000,
         verbose=False,
         malaria_prevalence=0.5,
@@ -85,7 +85,7 @@ class SickleSim(Model):
             age = 0
             while age < 5 or age > 75:
                 age = self.random.gauss(0, 30)
-            ages.append(age)
+            ages.append(round(age))
 
         self.initial_normal_child = round(0.1*initial_normal_adult)
         self.initial_carrier_child = round(0.1*initial_carrier_adult)
@@ -184,7 +184,7 @@ class SickleSim(Model):
             for i in range(round(dx1)):
                 x = self.random.randrange(self.width)
                 y = self.random.randrange(self.height)
-                child = ChildNormal(self.next_id(),(x,y),self, True, genotype=0.0)
+                child = ChildNormal(self.next_id(),(x,y),self, True, genotype=0.0, age=0)
                 self.grid.place_agent(child, (x, y))
                 self.schedule.add(child)
 
@@ -194,7 +194,7 @@ class SickleSim(Model):
             for i in range(round(dx2)):
                 x = self.random.randrange(self.width)
                 y = self.random.randrange(self.height)
-                child = ChildCarrier(self.next_id(), (x, y), self, True, genotype=0.5)
+                child = ChildCarrier(self.next_id(), (x, y), self, True, genotype=0.5, age=0)
                 self.grid.place_agent(child, (x, y))
                 self.schedule.add(child)
 
@@ -204,7 +204,7 @@ class SickleSim(Model):
             for i in range(round(dx3)):
                 x = self.random.randrange(self.width)
                 y = self.random.randrange(self.height)
-                child = ChildSickle(self.next_id(), (x, y), self, True, genotype=1.0)
+                child = ChildSickle(self.next_id(), (x, y), self, True, genotype=1.0, age=0)
                 self.grid.place_agent(child, (x, y))
                 self.schedule.add(child)
 
@@ -229,11 +229,12 @@ class SickleSim(Model):
             self.step()
 
     def delete_from_breed(self, breed, count):
-        agent_keys = []
-        for i in range(count):
-            agent_key = self.random.choice(list(self.schedule.agents_by_breed[breed].keys()))
-            if agent_key not in agent_keys:
-                agent = self.schedule.agents_by_breed[breed][agent_key]
-                self.grid.remove_agent(agent)
-                self.schedule.remove(agent)
-                agent_keys.append(agent_key)
+            agent_keys = []
+            for i in range(count):
+                if self.schedule.get_breed_count(breed) != 0:
+                    agent_key = self.random.choice(list(self.schedule.agents_by_breed[breed].keys()))
+                    if agent_key not in agent_keys:
+                        agent = self.schedule.agents_by_breed[breed][agent_key]
+                        self.grid.remove_agent(agent)
+                        self.schedule.remove(agent)
+                        agent_keys.append(agent_key)

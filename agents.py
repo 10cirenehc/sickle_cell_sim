@@ -7,9 +7,9 @@ class Adult(RandomWalker):
     The init is the same as the RandomWalker.
     """
     genotype = None
-    age = None
+    age = 20
 
-    def __init__(self, unique_id, pos, model, moore, genotype = None, age = None):
+    def __init__(self, unique_id, pos, model, moore, genotype = None, age = 20):
         super().__init__(unique_id, pos, model, moore=moore)
         self.genotype = genotype
         self.life_expectancy = 90
@@ -37,7 +37,7 @@ class AdultSickle(Adult):
     genotype = None
 
     def __init__(self, unique_id, pos, model, moore, genotype, age = None):
-        super().__init__(unique_id,pos, model, moore=moore, genotype=1.0, age = None)
+        super().__init__(unique_id,pos, model, moore=moore, genotype=1.0, age = 20)
         self.genotype = genotype
         self.age = age
 
@@ -48,7 +48,7 @@ class AdultSickle(Adult):
 class AdultCarrier(Adult):
 
     def __init__(self, unique_id, pos, model, moore, genotype, age = None):
-        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5, age = None)
+        super().__init__(unique_id, pos, model, moore=moore, genotype=0.5, age = 20)
         self.genotype = genotype
         self.age = age
 
@@ -59,7 +59,7 @@ class AdultCarrier(Adult):
 class AdultNormal(Adult):
 
     def __init__(self, unique_id, pos, model, moore, genotype, age = None):
-        super().__init__(unique_id, pos, model, moore=moore, genotype = 0, age = None)
+        super().__init__(unique_id, pos, model, moore=moore, genotype = 0, age = 20)
         self.genotype = genotype
         self.age = age
 
@@ -99,7 +99,7 @@ class ChildSickle(Child):
 
         if self.age >=5:
             teen = AdultSickle(
-                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
+                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype, age=5
             )
             self.model.grid.place_agent(teen, teen.pos)
             self.model.schedule.add(teen)
@@ -123,7 +123,7 @@ class ChildCarrier(Child):
 
         if self.age >=5:
             teen = AdultCarrier(
-                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
+                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype, age=5
             )
             self.model.grid.place_agent(teen, teen.pos)
             self.model.schedule.add(teen)
@@ -147,7 +147,7 @@ class ChildNormal(Child):
 
         if self.age >=5:
             teen = AdultNormal(
-                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype
+                self.model.next_id(), self.pos ,self.model, self.moore, self.genotype, age=5
             )
             self.model.grid.place_agent(teen, teen.pos)
             self.model.schedule.add(teen)
