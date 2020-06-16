@@ -67,6 +67,13 @@ chart_element = ChartModule(
      {"Label": "Carrier Children", "Color": "#FFD80F"}, {"Label": "Sickle Cell Children", "Color": "#C402CF"}]
 )
 
+death_count_chart = ChartModule(
+    [
+        {"Label": "Total Sickle Cell Deaths", "Color": "#F33006"},
+        {"Label": "Total Malaria Deaths", "Color": "#064AF3"}
+    ]
+)
+
 model_params = {
     "initial_normal_adult": UserSettableParameter(
         "slider", "Normal Adults", value=500, min_value=100, max_value=800, step=5
@@ -90,6 +97,6 @@ model_params = {
 }
 
 server = ModularServer(
-    SickleSim, [grid, chart_element], "Sickle Cell Selection", model_params
+    SickleSim, [grid, chart_element, death_count_chart], "Sickle Cell Selection", model_params
 )
 server.port = 8080

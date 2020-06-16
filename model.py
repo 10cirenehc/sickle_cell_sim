@@ -68,6 +68,8 @@ class SickleSim(Model):
 
         self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
+        self.totalSickleDeaths = 0
+        self.totalMalariaDeaths = 0
         self.datacollector = DataCollector(
             {
                 "Sickle Cell Adults": lambda m: m.schedule.get_breed_count(AdultSickle),
@@ -76,6 +78,8 @@ class SickleSim(Model):
                 "Sickle Cell Children": lambda m: m.schedule.get_breed_count(ChildSickle),
                 "Carrier Children": lambda m: m.schedule.get_breed_count(ChildCarrier),
                 "Normal Children": lambda m: m.schedule.get_breed_count(ChildNormal),
+                "Total Sickle Cell Deaths": lambda m: self.totalSickleDeaths,
+                "Total Malaria Deaths": lambda m: self.totalMalariaDeaths,
             }
         )
 
@@ -179,12 +183,15 @@ class SickleSim(Model):
         dy2 = -(0.007+0.00007*self.malaria_prevalence*self.heterozygous_advantage+0.002*self.sickle_cell_deadliness)*y2
         dy3 = -(0.007+0.00007*self.malaria_prevalence*self.heterozygous_advantage+0.4*self.sickle_cell_deadliness)*y3
 
-        print(str((((y1 ** 2)+(1/2)*y1*y2+(1/4)*(y2 ** 2))+((1/2)*y1*y2+(1/2)*(y2 ** 2))+(1/4)*(y2 ** 2))/((y1+y2+y3)**2)))
-        print(str(dy1))
-        print(str(dy2))
-        print(str(dx1))
-        print(str(dx2))
+        self.totalMalariaDeaths += round((0.075 * self.malaria_prevalence * x1)+
+                                   0.0013*self.malaria_prevalence*self.heterozygous_advantage*x2
+                                    +0.0013*self.malaria_prevalence*self.heterozygous_advantage*x3
+                                    +0.003*self.malaria_prevalence*y1
+                                    +0.00007*self.malaria_prevalence*self.heterozygous_advantage*y2
+                                    +0.00007*self.malaria_prevalence*self.heterozygous_advantage*y3)
 
+        self.totalSickleDeaths += round(0.009*self.sickle_cell_deadliness*x2+0.3*self.sickle_cell_deadliness*x3
+                                        + 0.002*self.sickle_cell_deadliness*y2+0.4*self.sickle_cell_deadliness*y3)
 
         if dx1 < 0:
             self.delete_from_breed(ChildNormal, abs(round(dx1)))
