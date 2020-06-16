@@ -36,7 +36,7 @@ class SickleSim(Model):
         initial_sickle_adult=100,
         initial_carrier_adult=100,
         life_expectancy=65,
-        carrying_capacity = 3000,
+        carrying_capacity = 5000,
         verbose=False,
         malaria_prevalence=0.5,
         sickle_cell_deadliness=0.5,
@@ -154,29 +154,37 @@ class SickleSim(Model):
         y2 = self.schedule.get_breed_count(AdultCarrier)
         y3 = self.schedule.get_breed_count(AdultSickle)
         population = x1+x2+x3+y1+y2+y3
-        growth_rate = (0.04*(1-(population/self.carrying_capacity)))
+
+        growth_rate = 0.05*(1-(population/self.carrying_capacity))
         if growth_rate < 0:
             growth_rate = 0
 
-        if self.schedule.get_agent_count() > 3000:
-            difference = self.schedule.get_agent_count()-3000
+        if self.schedule.get_agent_count() > self.carrying_capacity:
+            difference = self.schedule.get_agent_count()-self.carrying_capacity
             y1_del = round((y1/(y1+y2))*difference)
             y2_del = round((y2/(y1+y2))*difference)
             self.delete_from_breed(AdultNormal, y1_del)
             self.delete_from_breed(AdultCarrier, y2_del)
-            population = 3000
+            population = self.carrying_capacity
             y1 -= y1_del
             y2 -= y2_del
 
         dx1 = (((y1 ** 2)+(1/2)*y1*y2+(1/4)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population
-               - (0.015 * self.malaria_prevalence * x1))
+               - (0.075 * self.malaria_prevalence * x1))
         dx2 = (((1/2)*y1*y2+(1/2)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population
-               - ((0.0013*self.malaria_prevalence*self.heterozygous_advantage)+0.02*self.sickle_cell_deadliness)*x2)
-        dx3 = ((1/4)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population-(0.0013*self.malaria_prevalence
-            * self.heterozygous_advantage+0.5*self.sickle_cell_deadliness)*x3
-        dy1 = -(0.008+0.0006*self.malaria_prevalence)*y1
-        dy2 = -(0.008+0.00005*self.malaria_prevalence*self.heterozygous_advantage+0.02*self.sickle_cell_deadliness)*y2
-        dy3 = -(0.008+0.00005*self.malaria_prevalence*self.heterozygous_advantage+0.5*self.sickle_cell_deadliness)*y3
+               - ((0.0013*self.malaria_prevalence*self.heterozygous_advantage)+0.009*self.sickle_cell_deadliness)*x2)
+        dx3 = ((1/4)*(y2 ** 2))/((y1+y2+y3) ** 2)*growth_rate*population-((0.0013*self.malaria_prevalence
+                * self.heterozygous_advantage+0.3*self.sickle_cell_deadliness)*x3)
+        dy1 = -(0.007+0.003*self.malaria_prevalence)*y1
+        dy2 = -(0.007+0.00007*self.malaria_prevalence*self.heterozygous_advantage+0.002*self.sickle_cell_deadliness)*y2
+        dy3 = -(0.007+0.00007*self.malaria_prevalence*self.heterozygous_advantage+0.4*self.sickle_cell_deadliness)*y3
+
+        print(str((((y1 ** 2)+(1/2)*y1*y2+(1/4)*(y2 ** 2))+((1/2)*y1*y2+(1/2)*(y2 ** 2))+(1/4)*(y2 ** 2))/((y1+y2+y3)**2)))
+        print(str(dy1))
+        print(str(dy2))
+        print(str(dx1))
+        print(str(dx2))
+
 
         if dx1 < 0:
             self.delete_from_breed(ChildNormal, abs(round(dx1)))
@@ -229,12 +237,12 @@ class SickleSim(Model):
             self.step()
 
     def delete_from_breed(self, breed, count):
-            agent_keys = []
-            for i in range(count):
-                if self.schedule.get_breed_count(breed) != 0:
-                    agent_key = self.random.choice(list(self.schedule.agents_by_breed[breed].keys()))
-                    if agent_key not in agent_keys:
-                        agent = self.schedule.agents_by_breed[breed][agent_key]
-                        self.grid.remove_agent(agent)
-                        self.schedule.remove(agent)
-                        agent_keys.append(agent_key)
+        agent_keys = []
+        for i in range(count):
+            if self.schedule.get_breed_count(breed) != 0:
+                agent_key = self.random.choice(list(self.schedule.agents_by_breed[breed].keys()))
+                if agent_key not in agent_keys:
+                    agent = self.schedule.agents_by_breed[breed][agent_key]
+                    self.grid.remove_agent(agent)
+                    self.schedule.remove(agent)
+                    agent_keys.append(agent_key)

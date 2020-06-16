@@ -26,10 +26,10 @@ class Adult(RandomWalker):
         self.age += 1
 
         # Death
-        if self.age > self.life_expectancy:
-                self.model.grid._remove_agent(self.pos, self)
-                self.model.schedule.remove(self)
-                living = False
+        #if self.age > self.life_expectancy:
+                #self.model.grid._remove_agent(self.pos, self)
+                #self.model.schedule.remove(self)
+                #living = False
 
 
 class AdultSickle(Adult):

@@ -92,4 +92,4 @@ model_params = {
 server = ModularServer(
     SickleSim, [grid, chart_element], "Sickle Cell Selection", model_params
 )
-server.port = 8521
+server.port = 8080
